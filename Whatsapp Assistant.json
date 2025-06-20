@@ -1,0 +1,136 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        20
+      ],
+      "id": "bb4b99c1-54ec-4f39-854d-50bfc2ea9b60",
+      "name": "WhatsApp Trigger",
+      "webhookId": "804ec2fd-257c-4129-a573-a7329d862bb9",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "lnwYkxcTPOaP7pXB",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "You are JARVIS, my personal AI assistant. Always identify yourself as JARVIS when asked. Only respond directly to what the user requests. Do not explain or elaborate unless asked. Do not provide any extra information or interpret the user’s message. Respond clearly, concisely, and only when necessary.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -300,
+        20
+      ],
+      "id": "de6ba1d8-b0ae-4824-be84-6d49fa956630",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        200
+      ],
+      "id": "12b9838f-f921-4179-8449-f92c59ce2081",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hEdE5M0YLXe9BnVf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "614324495107575",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        100,
+        20
+      ],
+      "id": "1fc0e561-1c84-43aa-b718-7e1fceeb43d3",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "bb4058af-f864-482e-b7f1-9cb6a215e9ca",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "mdtgLOTpFv1tkCQt",
+          "name": "WhatsApp account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "656dc6b8-bf92-4d13-a461-0328bedcc16c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ba8ca8e771187850e6af878d317171cb3206c9e76fbbdf0bd28c2f6e8dca22ed"
+  },
+  "id": "fqsZUQSy81XA3ZQY",
+  "tags": []
+}
